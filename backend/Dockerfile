@@ -1,4 +1,4 @@
-FROM node:14 as build-deps
+FROM node:16 as build-deps
 
 RUN apt-get update && apt-get install -y wget
 
@@ -23,7 +23,11 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 WORKDIR /usr/src/app
 COPY package*.json ./
+RUN npm cache clean –force
+#RUN npm uninstall -g typescript
+#RUN npm install typescript --save-dev
 RUN npm install
+#RUN npm update
 
 COPY . .
 RUN npm run build
