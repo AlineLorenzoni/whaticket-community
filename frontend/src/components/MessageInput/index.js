@@ -220,6 +220,12 @@ const MessageInput = ({ ticketStatus }) => {
 
   const [signMessage, setSignMessage] = useLocalStorage("signOption", true);
 
+  const meuError = new Error();
+        meuError.response = {};
+        meuError.response.data = {
+          message: 'O arquivo passa de 16MB, não pode ser enviado!',
+        };
+
   useEffect(() => {
     inputRef.current.focus();
   }, [replyingMessage]);
@@ -254,13 +260,26 @@ const MessageInput = ({ ticketStatus }) => {
       return;
     }
 
-    const selectedMedias = Array.from(e.target.files);
-    setMedias(selectedMedias);
+    if (e.target.files[0] && e.target.files[0].size <= 16000000) { // Tamanho máximo de 5MB
+      const selectedMedias = Array.from(e.target.files);
+      setMedias(selectedMedias);
+    } else {
+      const selectedMedias = [];
+      setMedias([]);
+      toastError(meuError);
+    }
+
   };
 
   const handleInputPaste = (e) => {
+
     if (e.clipboardData.files[0]) {
-      setMedias([e.clipboardData.files[0]]);
+      if (e.clipboardData.files[0] && e.clipboardData.files[0].size <= 16000000) { // Tamanho máximo de 5MB
+        setMedias([e.clipboardData.files[0]]);
+      } else {
+        setMedias([]);
+        toastError(meuError);
+      }
     }
   };
 
